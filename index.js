@@ -29,6 +29,13 @@ const run = async () => {
             res.send(tourPlans);
         });
 
+        app.post('/add-plan', async(req, res)=>{
+            const newPlan = req.body;
+            const cursor = await tourPlanCollection.insertOne(newPlan);
+            res.json({message:"Your plan added successfully."});
+
+        })
+
         app.get('/tour-plan-detail/:planId', async (req, res) => {
             const planId = req.params.planId;
             const query = { _id: ObjectId(planId) }
