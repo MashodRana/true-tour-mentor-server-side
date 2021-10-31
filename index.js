@@ -2,6 +2,7 @@ const express = require('express');
 const cors = require('cors');
 require('dotenv').config();
 const {MongoClient, ObjectId} = require('mongodb');
+const { query } = require('express');
 const app = express();
 const port = process.env.PORT || 5000;
 
@@ -20,6 +21,7 @@ const run = async ()=>{
 
         const database = client.db('true_tour_mentor');
         const tourPlanCollection = database.collection('tour_plans');
+        const orderCollection = database.collection('order');
 
         app.get('/tour-plans', async(req, res)=>{
             const crusor = tourPlanCollection.find({});
@@ -33,6 +35,31 @@ const run = async ()=>{
             const cursor = await tourPlanCollection.findOne(query);
             // console.log(cursor);
             res.json(cursor)
+        })
+
+        app.post('/add-order', async(req, res)=>{
+            const orderData = req.body
+            console.log(orderData)
+            const cursor = await orderCollection.insertOne(orderData);
+            console.log('cursor result ',cursor)
+            res.json({message:"We have received your information. Soon, we will contact with you."})
+        })
+
+        app.get('/my-orders/:userEmail', async(req, res)=>{
+            const userEmail = req.params.userEmail;
+            const query = {email:userEmail};
+            console.log(query)
+            const cursor = orderCollection.find(query);
+            const orders = await cursor.toArray();
+            res.json(orders);
+
+        })
+
+        app.delete('/remove-orders/:orderId', async(req,res)=>{
+            const orderId = req.params.orderId;
+            const query = {_id:ObjectId(orderId)};
+            const cursor = await orderCollection.deleteOne(query);
+            res.json({message:"your order is cancled. Pleae stay with us."});
         })
     }
     finally{
