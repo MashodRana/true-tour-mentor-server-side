@@ -75,6 +75,15 @@ const run = async () => {
             res.json(allOrders);
         });
 
+        app.put("/update-order-status/:orderId", async(req, res)=>{
+            const orderId=req.params.orderId;
+            const cursor = await orderCollection.updateOne(
+                {_id:ObjectId(orderId)},
+                {$set:{orderStatus:'accepted'}}
+                );
+            res.json({message:"status successful updated."})
+        })
+
     }
     finally {
         // await client.close();
